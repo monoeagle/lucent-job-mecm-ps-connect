@@ -253,8 +253,10 @@ geloescht.
 nur die `triggers`-Map, keine Live-MECM-Daten.
 
 **Fix:** `tofu taint null_resource.wait_for_configmgr` und neu apply,
-damit der Wait nochmal laeuft. Oder Provider mit Read-Funktion bauen
-(Block 6).
+damit der Wait nochmal laeuft. Drift-Detection via `null_resource` ist
+nicht moeglich — das ist eine bewusste Scope-Entscheidung des Repos
+(Skript-Helper statt eigener Provider). Wer Read-/Drift-Funktion
+braucht, muesste einen Tofu-Provider bauen.
 
 ### 3.4 Konkurrierende Apply-Runs
 
