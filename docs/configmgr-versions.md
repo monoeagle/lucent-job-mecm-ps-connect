@@ -1,4 +1,33 @@
-# MECM / ConfigMgr — Versionierung & Stand 2026
+# Microsoft Configuration Manager — Namen, Versionen, Stand 2026
+
+## Naming-Historie — was heißt das Produkt eigentlich heute?
+
+| Zeitraum | Offizieller Name | Kürzel |
+|---|---|---|
+| 1994–2003 | Systems Management Server | SMS |
+| 2007–2019 | System Center Configuration Manager | SCCM, ConfigMgr |
+| Ende 2019 – ~2022 | Microsoft Endpoint Configuration Manager | **MECM** |
+| ~2022 – heute | **Microsoft Configuration Manager** | **ConfigMgr**, MCM |
+
+Hintergrund der Umbenennungen:
+
+- **2007 (SMS → SCCM):** Eingliederung in die "System Center"-Suite.
+- **Ende 2019 (SCCM → MECM):** Microsoft führte die Dachmarke
+  **"Microsoft Endpoint Manager" (MEM)** ein, die ConfigMgr und Intune
+  zusammenklammerte. Daher das "Endpoint" im Namen.
+- **~2022 (MECM → ConfigMgr/MCM):** Microsoft hat "Microsoft Endpoint
+  Manager" als Dachmarke wieder aufgegeben. Alles läuft jetzt unter
+  **"Microsoft Intune family"**; ConfigMgr verlor das "Endpoint"-Präfix.
+
+**Konsequenz für 2026:**
+
+- Aktueller offizieller Name: **Microsoft Configuration Manager** (kurz
+  ConfigMgr, manchmal MCM).
+- Die Dokumentation bei Microsoft liegt unter
+  `learn.microsoft.com/en-us/intune/configmgr/`.
+- In der Praxis wird weiter SCCM und MECM gesagt — die offizielle
+  Umbenennung wurde nie konsequent in den Sprachgebrauch übernommen.
+- Co-Management mit Intune ist der Standard-Modernisierungspfad.
 
 ## Versionierungs-Schema
 
@@ -93,5 +122,5 @@ Für die vier in [`OVERVIEW.md`](../OVERVIEW.md) skizzierten Wege:
 | 05 WinRM + Cmdlet-Package | jede (Cmdlet-Compat im Package muss zur Site passen) |
 
 **Konsequenz:** In jeder realistischen 2026er-Umgebung sind alle fünf Wege
-verfügbar. Die Wahl hängt nicht an der MECM-Version, sondern an **AdminService-
+verfügbar. Die Wahl hängt nicht an der ConfigMgr-Version, sondern an **AdminService-
 Aktivierung**, **Netzwerk-/Auth-Setup** und **Betriebs-Constraints**.

@@ -32,7 +32,7 @@ while [ "$(date +%s)" -lt "$deadline" ]; do
             exit 0
         fi
     else
-        echo "[$(date -Iseconds)] ${COMPUTER_NAME} noch nicht in MECM bekannt"
+        echo "[$(date -Iseconds)] ${COMPUTER_NAME} noch nicht in ConfigMgr bekannt"
     fi
 
     sleep "$INTERVAL"

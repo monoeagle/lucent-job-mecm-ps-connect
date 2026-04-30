@@ -7,7 +7,7 @@ variable "cmdlet_path"   {
   default = "C:\\Tools\\PSCMDLets"
 }
 
-resource "null_resource" "wait_for_mecm" {
+resource "null_resource" "wait_for_configmgr" {
   triggers = {
     computer_name = var.computer_name
   }
@@ -15,7 +15,7 @@ resource "null_resource" "wait_for_mecm" {
   provisioner "local-exec" {
     interpreter = ["/bin/bash", "-c"]
     command     = <<-EOT
-      pwsh ${path.module}/Wait-MecmDeployed.ps1 \
+      pwsh ${path.module}/Wait-ConfigMgrDeployed.ps1 \
         -ComputerName ${var.computer_name} \
         -WindowsHost  ${var.windows_host} \
         -SiteCode     ${var.site_code} \

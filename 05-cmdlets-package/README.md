@@ -1,7 +1,7 @@
 # 05 — Cmdlet-Package via WinRM
 
 Wie Variante 03 (Linux → WinRM → Windows-Host mit `ConfigurationManager`-
-Modul), **aber ohne vollständige MECM-Admin-Console-Installation auf dem
+Modul), **aber ohne vollständige ConfigMgr-Admin-Console-Installation auf dem
 Windows-Host**. Stattdessen wird ein vorab exportiertes Cmdlet-Package
 bereitgestellt und via Pfad-/Env-Variable geladen.
 
@@ -21,7 +21,7 @@ bereitgestellt und via Pfad-/Env-Variable geladen.
   - WinRM HTTPS auf 5986 erreichbar
   - PowerShell 5.1 oder 7
   - Cmdlet-Package entpackt unter z.B. `C:\Tools\PSCMDLets\`
-- Service-Account mit MECM-RBAC (mind. Read-only Analyst)
+- Service-Account mit ConfigMgr-RBAC (mind. Read-only Analyst)
 
 ## Cmdlet-Package herstellen
 
@@ -49,8 +49,8 @@ prüft Package, registriert PSDrive, validiert Verbindung.
 
 ## Dateien
 
-- `Wait-MecmDeployed.ps1` — läuft auf Linux-Runner, baut WinRM-Session
-- `windows/Get-MecmStatus.ps1` — auf Windows-Host ausgeführt; lädt Modul
+- `Wait-ConfigMgrDeployed.ps1` — läuft auf Linux-Runner, baut WinRM-Session
+- `windows/Get-ConfigMgrStatus.ps1` — auf Windows-Host ausgeführt; lädt Modul
   per Pfad statt aus Console-Install
 - `windows/Setup-CmdletPackage.ps1` — One-time-Prep auf dem Windows-Host
 - `main.tf` — Tofu-Beispiel
@@ -58,7 +58,7 @@ prüft Package, registriert PSDrive, validiert Verbindung.
 ## Aufruf manuell
 
 ```bash
-pwsh ./Wait-MecmDeployed.ps1 \
+pwsh ./Wait-ConfigMgrDeployed.ps1 \
     -ComputerName <PC> \
     -WindowsHost <fqdn-des-windows-worker> \
     -SiteCode <SiteCode> \

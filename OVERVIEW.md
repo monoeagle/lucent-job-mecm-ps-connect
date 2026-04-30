@@ -1,13 +1,13 @@
-# MECM-Anbindung aus OpenTofu (Linux-Runner) — Übersicht
+# ConfigMgr-Anbindung aus OpenTofu (Linux-Runner) — Übersicht
 
-Ziel: OpenTofu auf einem Linux-Runner soll warten, bis ein Rechner in MECM
+Ziel: OpenTofu auf einem Linux-Runner soll warten, bis ein Rechner in ConfigMgr
 den Status "ausgerollt" erreicht hat, bevor Folge-Resources angelegt werden.
 
 ## Entscheidungsbaum
 
 ```mermaid
 flowchart TD
-    Start([Tofu braucht MECM-Status]) --> Q1{AdminService<br/>REST aktiv?<br/>CB 1810+}
+    Start([Tofu braucht ConfigMgr-Status]) --> Q1{AdminService<br/>REST aktiv?<br/>CB 1810+}
     Q1 -- ja --> Q2{pwsh auf<br/>Runner OK?}
     Q1 -- nein --> Q3{Direkter SQL-<br/>Zugriff erlaubt?}
     Q2 -- ja --> A1[01 — AdminService + pwsh]
@@ -39,9 +39,9 @@ nichts anderes geht (DBA-Approval, brittler bei CM-Upgrades).
 | Latenz pro Poll | ~1-2s | ~1-2s | ~3-5s (Hop) | <500ms | ~3-5s (Hop) |
 | Ports nach außen | 443 | 443 | 5986 | 1433 | 5986 |
 | Setup-Aufwand | mittel | mittel | hoch | niedrig | mittel-hoch |
-| Berechtigungs-Granularität | RBAC AdminService | RBAC AdminService | volles MECM-RBAC | DB-Read | volles MECM-RBAC |
+| Berechtigungs-Granularität | RBAC AdminService | RBAC AdminService | volles ConfigMgr-RBAC | DB-Read | volles ConfigMgr-RBAC |
 | Cmdlet-Funktionsumfang | begrenzt (REST-Subset) | begrenzt (REST-Subset) | voll (`Get-CM*` etc.) | irrelevant (SQL) | voll (`Get-CM*` etc.) |
-| Min. MECM-Version | 1810 | 1810 | jede | jede (View-Stabilität CB-abhängig) | jede |
+| Min. ConfigMgr-Version | 1810 | 1810 | jede | jede (View-Stabilität CB-abhängig) | jede |
 | Risiko bei CM-Upgrade | gering | gering | gering | mittel (View-Schema) | mittel (Cmdlet-Compat im Package) |
 | Wartung Windows-Komponente | n/a | n/a | MS-Update-Pfad (MSI) | n/a | manuelle Package-Pflege |
 
@@ -52,15 +52,15 @@ nichts anderes geht (DBA-Approval, brittler bei CM-Upgrades).
 ```mermaid
 sequenceDiagram
     participant Tofu as OpenTofu
-    participant NR as null_resource.wait_for_mecm
+    participant NR as null_resource.wait_for_configmgr
     participant Script as wait-script
-    participant MECM as MECM (Provider/SQL)
+    participant ConfigMgr as ConfigMgr (Provider/SQL)
 
     Tofu->>NR: apply
     NR->>Script: local-exec
     loop alle 30s bis Timeout
-        Script->>MECM: query device + TS status
-        MECM-->>Script: state
+        Script->>ConfigMgr: query device + TS status
+        ConfigMgr-->>Script: state
         alt deployed
             Script-->>NR: exit 0
         else nicht deployed
@@ -79,10 +79,10 @@ sequenceDiagram
 flowchart LR
     subgraph Linux Runner
         TF[OpenTofu] --> NR[null_resource]
-        NR --> PWSH[pwsh<br/>Wait-MecmDeployed.ps1]
+        NR --> PWSH[pwsh<br/>Wait-ConfigMgrDeployed.ps1]
         PWSH --> KRB[Kerberos<br/>Ticket-Cache]
     end
-    subgraph MECM
+    subgraph ConfigMgr
         AS[AdminService<br/>IIS auf SMS-Provider<br/>HTTPS 443]
         AS --> SP[SMS Provider<br/>WMI]
         SP --> DB[(CM_DB)]
@@ -105,12 +105,12 @@ flowchart LR
 flowchart LR
     subgraph Linux Runner
         TF[OpenTofu] --> NR[null_resource]
-        NR --> SH[bash<br/>wait-mecm-deployed.sh]
+        NR --> SH[bash<br/>wait-configmgr-deployed.sh]
         SH --> CURL[curl --negotiate]
         SH --> JQ[jq]
         CURL --> KRB[krb5 Ticket-Cache]
     end
-    subgraph MECM
+    subgraph ConfigMgr
         AS[AdminService<br/>HTTPS 443]
         AS --> SP[SMS Provider]
         SP --> DB[(CM_DB)]
@@ -131,14 +131,14 @@ flowchart LR
 flowchart LR
     subgraph Linux Runner
         TF[OpenTofu] --> NR[null_resource]
-        NR --> PWSH[pwsh<br/>Wait-MecmDeployed.ps1]
+        NR --> PWSH[pwsh<br/>Wait-ConfigMgrDeployed.ps1]
     end
     subgraph Windows Jumphost
         WSMAN[WinRM<br/>HTTPS 5986]
-        REMOTE[Get-MecmStatus.ps1<br/>importiert<br/>ConfigurationManager.psd1]
+        REMOTE[Get-ConfigMgrStatus.ps1<br/>importiert<br/>ConfigurationManager.psd1]
         WSMAN --> REMOTE
     end
-    subgraph MECM
+    subgraph ConfigMgr
         SP[SMS Provider<br/>WMI/DCOM]
         SP --> DB[(CM_DB)]
     end
@@ -163,10 +163,10 @@ WinRM-HTTPS muss eingerichtet sein.
 flowchart LR
     subgraph Linux Runner
         TF[OpenTofu] --> NR[null_resource]
-        NR --> SH[bash<br/>wait-mecm-deployed.sh]
+        NR --> SH[bash<br/>wait-configmgr-deployed.sh]
         SH --> SQLCMD[sqlcmd<br/>mssql-tools]
     end
-    subgraph MECM
+    subgraph ConfigMgr
         SQL[(SQL Server<br/>1433<br/>CM_SiteCode)]
         VIEWS[v_R_System<br/>v_TaskExecutionStatus<br/>v_CH_ClientSummary]
         SQL --> VIEWS
@@ -191,16 +191,16 @@ Major-Upgrades ändern, separater Netzwerkpfad zur SQL.
 flowchart LR
     subgraph Linux Runner
         TF[OpenTofu] --> NR[null_resource]
-        NR --> PWSH[pwsh<br/>Wait-MecmDeployed.ps1]
+        NR --> PWSH[pwsh<br/>Wait-ConfigMgrDeployed.ps1]
     end
     subgraph Windows Worker-Host
         WSMAN[WinRM<br/>HTTPS 5986]
         PKG["Cmdlet-Package<br/>z.B. C:\Tools\PSCMDLets\<br/>(ConfigurationManager.psd1<br/>+ DLLs)"]
-        REMOTE[Get-MecmStatus.ps1<br/>Import-Module per Pfad<br/>SMS_ADMIN_UI_PATH gesetzt]
+        REMOTE[Get-ConfigMgrStatus.ps1<br/>Import-Module per Pfad<br/>SMS_ADMIN_UI_PATH gesetzt]
         WSMAN --> REMOTE
         REMOTE --> PKG
     end
-    subgraph MECM
+    subgraph ConfigMgr
         SP[SMS Provider<br/>WMI/DCOM]
         SP --> DB[(CM_DB)]
     end
@@ -231,7 +231,7 @@ Cmdlet-Compatibility nach CM-Upgrades selbst prüfen.
 
 ---
 
-## Auth-Flow (Linux → MECM)
+## Auth-Flow (Linux → ConfigMgr)
 
 Gleich für Variante 01, 02, 04 (Kerberos) und sinngemäß für 03/05:
 
@@ -239,7 +239,7 @@ Gleich für Variante 01, 02, 04 (Kerberos) und sinngemäß für 03/05:
 sequenceDiagram
     participant Runner as Linux Runner
     participant KDC as AD KDC<br/>(Domain Controller)
-    participant Target as MECM Endpoint<br/>(AdminService / WinRM / SQL)
+    participant Target as ConfigMgr Endpoint<br/>(AdminService / WinRM / SQL)
 
     Runner->>Runner: kinit -kt /etc/krb5.keytab svc-tofu@DOMAIN
     Runner->>KDC: AS-REQ (mit Keytab)
@@ -250,11 +250,11 @@ sequenceDiagram
     Target-->>Runner: 200 OK
 ```
 
-**Voraussetzungen im AD/MECM:**
-- Service-Account `svc-tofu` mit MECM-RBAC-Rolle "Read-only Analyst"
+**Voraussetzungen im AD/ConfigMgr:**
+- Service-Account `svc-tofu` mit ConfigMgr-RBAC-Rolle "Read-only Analyst"
   (oder spezifischer)
 - Keytab erzeugt: `ktpass /princ HTTP/runner@DOMAIN /mapuser svc-tofu ...`
-- SPNs auf MECM-Seite korrekt registriert (für AdminService normalerweise
+- SPNs auf ConfigMgr-Seite korrekt registriert (für AdminService normalerweise
   automatisch via IIS-Computerkonto)
 
 ---

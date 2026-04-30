@@ -1,6 +1,6 @@
 # 04 — Direkt gegen die CM-SQL-DB
 
-Schnellster Weg, am wenigsten "MECM-konform". Nutzt die offiziell dokumentierten
+Schnellster Weg, am wenigsten "ConfigMgr-konform". Nutzt die offiziell dokumentierten
 `v_*`-Views in `CM_<SiteCode>`. Read-only, niemals schreiben.
 
 ## Voraussetzungen
@@ -11,14 +11,14 @@ Schnellster Weg, am wenigsten "MECM-konform". Nutzt die offiziell dokumentierten
 
 ## Dateien
 
-- `wait-mecm-deployed.sh`
+- `wait-configmgr-deployed.sh`
 - `main.tf`
 
 ## Aufruf manuell
 
 ```bash
 kinit -kt /etc/krb5.keytab svc-tofu@DOMAIN.LOCAL
-./wait-mecm-deployed.sh PC123 sql.corp.local CM_P01
+./wait-configmgr-deployed.sh PC123 sql.corp.local CM_P01
 ```
 
 ## Genutzte Views

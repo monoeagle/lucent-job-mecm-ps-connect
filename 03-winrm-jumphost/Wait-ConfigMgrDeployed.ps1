@@ -9,7 +9,7 @@ param(
 )
 
 $ErrorActionPreference = 'Stop'
-$remoteScript = Join-Path $PSScriptRoot 'jumphost/Get-MecmStatus.ps1'
+$remoteScript = Join-Path $PSScriptRoot 'jumphost/Get-ConfigMgrStatus.ps1'
 
 $session = New-PSSession -ComputerName $Jumphost -Authentication Negotiate -UseSSL
 try {

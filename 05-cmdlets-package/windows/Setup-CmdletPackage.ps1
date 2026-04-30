@@ -35,4 +35,4 @@ finally {
     Pop-Location
 }
 
-Write-Host "`nSetup ok — Get-MecmStatus.ps1 kann jetzt remote aufgerufen werden."
+Write-Host "`nSetup ok — Get-ConfigMgrStatus.ps1 kann jetzt remote aufgerufen werden."

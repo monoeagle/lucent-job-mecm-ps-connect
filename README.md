@@ -1,16 +1,24 @@
-# MECM Deployment-Status für OpenTofu
+# ConfigMgr Deployment-Status für OpenTofu
 
 Fünf Wege, um aus einem Linux-Runner heraus den "Rechner ist ausgerollt"-Status
-aus MECM (ConfigMgr) zu lesen und OpenTofu darauf warten zu lassen.
+aus **Microsoft Configuration Manager** (offiziell `ConfigMgr` / informell
+weiter `SCCM` oder `MECM`) zu lesen und OpenTofu darauf warten zu lassen.
+
+> **Naming-Hinweis:** Der Repo-Slug enthält aus historischen Gründen noch
+> `mecm`. Inhaltlich/dokumentarisch ist alles auf den aktuellen Produktnamen
+> **ConfigMgr** umgestellt. Kontext zur Namenshistorie in
+> [`docs/configmgr-versions.md`](docs/configmgr-versions.md).
 
 ## Dokumentation
 
 - [`OVERVIEW.md`](OVERVIEW.md) — Entscheidungsbaum, Vergleich, Flussdiagramme
   pro Variante
 - [`docs/adminservice.md`](docs/adminservice.md) — Architektur, URLs, Auth und
-  Nutzung des MECM AdminService
-- [`docs/mecm-versions.md`](docs/mecm-versions.md) — Versions-Schema,
-  Release-Cadence, Stand 2026, Detektion
+  Nutzung des ConfigMgr AdminService
+- [`docs/configmgr-versions.md`](docs/configmgr-versions.md) — Naming-Historie,
+  Versions-Schema, Release-Cadence, Stand 2026, Detektion
+- [`docs/compatibility-2026.md`](docs/compatibility-2026.md) — Kompatibilitäts-
+  Check der 5 Wege gegen aktuelle ConfigMgr-Versionen (2503/2509/2603)
 
 | Ordner | Stack | Voraussetzungen | Stärke | Schwäche |
 |---|---|---|---|---|
@@ -34,16 +42,16 @@ Anpassen je nach Rollout-Definition (z.B. zusätzlich Pflicht-Apps compliant).
 Standardpattern in jedem Ordner:
 
 ```hcl
-resource "null_resource" "wait_for_mecm" {
+resource "null_resource" "wait_for_configmgr" {
   triggers = { computer_name = var.computer_name }
 
   provisioner "local-exec" {
-    command = "./wait-mecm-deployed.sh ${var.computer_name}"
+    command = "./wait-configmgr-deployed.sh ${var.computer_name}"
   }
 }
 
 resource "next_thing" "x" {
-  depends_on = [null_resource.wait_for_mecm]
+  depends_on = [null_resource.wait_for_configmgr]
   # ...
 }
 ```

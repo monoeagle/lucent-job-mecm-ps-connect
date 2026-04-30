@@ -1,4 +1,4 @@
-# MECM AdminService — Architektur & Nutzung
+# ConfigMgr AdminService — Architektur & Nutzung
 
 ## Was ist der AdminService?
 
@@ -21,7 +21,7 @@ auf dem Site-Server selbst, kann aber auch auf separate Server verlagert sein.
 
 ```mermaid
 flowchart TB
-    subgraph Site["MECM Primary Site"]
+    subgraph Site["ConfigMgr Primary Site"]
         subgraph SiteServer["Site Server (Windows)"]
             IIS["IIS<br/>Port 443"]
             AS["AdminService<br/>(ASP.NET-WebApp)"]
@@ -131,7 +131,7 @@ flowchart LR
 ## Berechtigungs-Modell
 
 Der AdminService nutzt das **gleiche RBAC-System wie die ConfigMgr-Console**.
-Kein separates Permission-Setup — nur eine MECM-Rolle für den Service-Account
+Kein separates Permission-Setup — nur eine ConfigMgr-Rolle für den Service-Account
 (z.B. "Read-only Analyst" oder eine custom Role mit eingeschränktem Scope auf
 bestimmte Collections / Sicherheitsbereiche).
 

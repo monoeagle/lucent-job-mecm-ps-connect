@@ -8,19 +8,19 @@ auszuführen, das die CM-Console-DLLs lädt.
 ## Voraussetzungen
 
 - pwsh 7 auf dem Linux-Runner
-- Windows-Jumphost mit installierter MECM-Admin-Console
+- Windows-Jumphost mit installierter ConfigMgr-Admin-Console
 - WinRM HTTPS auf Jumphost konfiguriert, Port 5986 erreichbar
-- Service-Account mit Read-Rechten in MECM, vorab via Kerberos angemeldet
+- Service-Account mit Read-Rechten in ConfigMgr, vorab via Kerberos angemeldet
   (Linux: `kinit -kt …`)
 
 ## Dateien
 
-- `Wait-MecmDeployed.ps1` — läuft auf dem Runner, baut die WinRM-Session auf
-- `jumphost/Get-MecmStatus.ps1` — wird auf den Jumphost übertragen und ausgeführt
+- `Wait-ConfigMgrDeployed.ps1` — läuft auf dem Runner, baut die WinRM-Session auf
+- `jumphost/Get-ConfigMgrStatus.ps1` — wird auf den Jumphost übertragen und ausgeführt
 - `main.tf`
 
 ## Aufruf manuell
 
 ```bash
-pwsh ./Wait-MecmDeployed.ps1 -ComputerName PC123 -Jumphost cmjump01.corp.local -SiteCode P01
+pwsh ./Wait-ConfigMgrDeployed.ps1 -ComputerName PC123 -Jumphost cmjump01.corp.local -SiteCode P01
 ```

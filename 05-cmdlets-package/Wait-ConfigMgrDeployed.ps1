@@ -11,7 +11,7 @@ param(
 )
 
 $ErrorActionPreference = 'Stop'
-$remoteScript = Join-Path $PSScriptRoot 'windows/Get-MecmStatus.ps1'
+$remoteScript = Join-Path $PSScriptRoot 'windows/Get-ConfigMgrStatus.ps1'
 
 $session = New-PSSession -ComputerName $WindowsHost -Authentication Negotiate -UseSSL
 try {

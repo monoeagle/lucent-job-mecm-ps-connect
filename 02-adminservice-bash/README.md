@@ -11,12 +11,12 @@ Wie 01, aber ohne PowerShell-Dependency. Pure Bash, `curl` mit Kerberos und `jq`
 
 ## Dateien
 
-- `wait-mecm-deployed.sh`
+- `wait-configmgr-deployed.sh`
 - `main.tf`
 
 ## Aufruf manuell
 
 ```bash
 kinit -kt /etc/krb5.keytab svc-tofu@DOMAIN.LOCAL
-./wait-mecm-deployed.sh PC123 sccm.corp.local P01
+./wait-configmgr-deployed.sh PC123 sccm.corp.local P01
 ```
