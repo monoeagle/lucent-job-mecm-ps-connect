@@ -1,3 +1,5 @@
+[![CI](https://github.com/monoeagle/lucent-mecm-ps-connect/actions/workflows/ci.yml/badge.svg)](https://github.com/monoeagle/lucent-mecm-ps-connect/actions/workflows/ci.yml)
+
 # ConfigMgr Deployment-Status für OpenTofu
 
 Fünf Wege, um aus einem Linux-Runner heraus den "Rechner ist ausgerollt"-Status
