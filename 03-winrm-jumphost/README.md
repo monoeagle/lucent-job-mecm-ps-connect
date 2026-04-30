@@ -25,6 +25,15 @@ auszuführen, das die CM-Console-DLLs lädt.
 pwsh ./Wait-ConfigMgrDeployed.ps1 -ComputerName PC123 -Jumphost cmjump01.corp.local -SiteCode P01
 ```
 
+## Demo-Skripte
+
+10 Skripte unter [`Demo/`](Demo/) zeigen was sich ueber die
+ConfigurationManager-Cmdlets abfragen laesst (Devices, Hardware-/Software-
+Inventory, Collections, Deployments, Task-Sequence-Status, Client-Health,
+Cmdlet-Discovery, DPs/MPs/Boundaries). Siehe [`Demo/Übersicht.md`](Demo/Übersicht.md).
+
+Die Skripte sind 5.1-kompatibel und laufen direkt auf dem Jumphost.
+
 ## Windows PowerShell 5.1
 
 5.1-kompatible Variante des Wait-Skripts unter

@@ -27,6 +27,13 @@ kinit -kt /etc/krb5.keytab svc-tofu@DOMAIN.LOCAL
 - `v_TaskExecutionStatus` — TS-Run-Historie pro Resource
 - `v_CH_ClientSummary` — Client-Health (optional ergänzend)
 
+## Demo-Skripte
+
+10 Skripte unter [`Demo/`](Demo/) zeigen was sich aus den `v_*`-Views der
+ConfigMgr-DB abfragen laesst (Devices, HW-/SW-Inventory, Collections,
+Deployments, TS-Status, Client-Health, View-Discovery, komplexe
+Aggregationen). Siehe [`Demo/Übersicht.md`](Demo/Übersicht.md).
+
 ## Als Tofu-Modul verwenden
 
 ```hcl

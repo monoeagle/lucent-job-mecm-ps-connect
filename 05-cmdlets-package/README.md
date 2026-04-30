@@ -72,6 +72,11 @@ pwsh ./Wait-ConfigMgrDeployed.ps1 \
 - [garytown — ConfigMgr PowerShell Module Package](https://garytown.com/configmgr-powershell-module-package)
 - [garrettyamada — Connecting to SCCM using PowerShell](https://garrettyamada.com/posts/connecting-to-sccm-using-powershell)
 
+## Demo-Skripte
+
+Identisch zu Variante 03 — siehe [`Demo/README.md`](Demo/README.md) fuer
+den Setup-Unterschied (Cmdlet-Package laden statt Console-Install).
+
 ## Windows PowerShell 5.1
 
 5.1-kompatible Variante des Wait-Skripts unter
