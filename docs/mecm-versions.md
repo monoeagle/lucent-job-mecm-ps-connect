@@ -88,9 +88,10 @@ Für die vier in [`OVERVIEW.md`](../OVERVIEW.md) skizzierten Wege:
 |---|---|
 | 01 AdminService + pwsh | **1810** |
 | 02 AdminService + bash | **1810** |
-| 03 WinRM-Jumphost (CM-Modul) | jede |
+| 03 WinRM-Jumphost (Console-Install) | jede |
 | 04 SQL direkt (Views) | jede (View-Schema kann pro CB leicht variieren) |
+| 05 WinRM + Cmdlet-Package | jede (Cmdlet-Compat im Package muss zur Site passen) |
 
-**Konsequenz:** In jeder realistischen 2026er-Umgebung sind alle vier Wege
+**Konsequenz:** In jeder realistischen 2026er-Umgebung sind alle fünf Wege
 verfügbar. Die Wahl hängt nicht an der MECM-Version, sondern an **AdminService-
 Aktivierung**, **Netzwerk-/Auth-Setup** und **Betriebs-Constraints**.

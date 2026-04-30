@@ -1,6 +1,6 @@
 # MECM Deployment-Status für OpenTofu
 
-Vier Wege, um aus einem Linux-Runner heraus den "Rechner ist ausgerollt"-Status
+Fünf Wege, um aus einem Linux-Runner heraus den "Rechner ist ausgerollt"-Status
 aus MECM (ConfigMgr) zu lesen und OpenTofu darauf warten zu lassen.
 
 ## Dokumentation
@@ -18,6 +18,7 @@ aus MECM (ConfigMgr) zu lesen und OpenTofu darauf warten zu lassen.
 | `02-adminservice-bash` | curl + jq + AdminService REST | curl, jq, kinit, AdminService aktiv | Keine pwsh-Dependency, leichtgewichtig | Mehr Bash-Glue für Fehler-Handling |
 | `03-winrm-jumphost` | pwsh → WinRM → Windows-Jumphost mit `ConfigurationManager`-Modul | pwsh-remoting, Jumphost mit Console | Voller Cmdlet-Zugriff, AdminService nicht nötig | Zwei-Hop-Auth, mehr Moving Parts |
 | `04-sql-direct` | sqlcmd (mssql-tools) gegen CM-DB Views | Read-Account auf `CM_<Site>`, Netzwerkpfad zu SQL | Schnellste Queries, beste für komplexe Joins | Nur Read, DBA-Approval nötig, brittler bei CM-Upgrades |
+| `05-cmdlets-package` | pwsh → WinRM → Windows-Host mit exportiertem Cmdlet-Package | pwsh-remoting, Windows-Host (kein Console-Install), Cmdlet-Package | Voller Cmdlet-Zugriff ohne Console-Installation | Package nicht offiziell distribuiert, manuelle Pflege |
 
 ## Definition "deployed"
 

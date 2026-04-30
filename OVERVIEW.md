@@ -13,11 +13,14 @@ flowchart TD
     Q2 -- ja --> A1[01 — AdminService + pwsh]
     Q2 -- nein --> A2[02 — AdminService + bash/curl]
     Q3 -- ja --> A4[04 — SQL direkt]
-    Q3 -- nein --> A3[03 — WinRM-Jumphost]
+    Q3 -- nein --> Q4{Console-Install auf<br/>Windows-Hop möglich?}
+    Q4 -- ja --> A3[03 — WinRM-Jumphost<br/>mit Admin-Console]
+    Q4 -- nein --> A5[05 — WinRM<br/>+ Cmdlet-Package]
 
     style A1 fill:#d4edda
     style A2 fill:#d4edda
     style A3 fill:#fff3cd
+    style A5 fill:#fff3cd
     style A4 fill:#f8d7da
 ```
 
@@ -28,19 +31,23 @@ nichts anderes geht (DBA-Approval, brittler bei CM-Upgrades).
 
 ## Vergleichsmatrix
 
-| Kriterium | 01 pwsh+REST | 02 bash+REST | 03 WinRM-Jumphost | 04 SQL direkt |
-|---|---|---|---|---|
-| Linux-Runner native | ✅ (mit pwsh) | ✅ | ✅ (mit pwsh) | ✅ |
-| Microsoft-supported | ✅ | ✅ | ✅ | ⚠️ Views ja, Schema nein |
-| Latenz pro Poll | ~1-2s | ~1-2s | ~3-5s (Hop) | <500ms |
-| Ports nach außen | 443 | 443 | 5986 | 1433 |
-| Setup-Aufwand | mittel | mittel | hoch | niedrig |
-| Berechtigungs-Granularität | RBAC AdminService | RBAC AdminService | volles MECM-RBAC | DB-Read |
-| Risiko bei CM-Upgrade | gering | gering | gering | mittel (View-Schema) |
+| Kriterium | 01 pwsh+REST | 02 bash+REST | 03 WinRM + Console | 04 SQL direkt | 05 WinRM + Cmdlet-Pkg |
+|---|---|---|---|---|---|
+| Linux-Runner als Origin | ✅ (mit pwsh) | ✅ | ✅ (mit pwsh) | ✅ | ✅ (mit pwsh) |
+| Windows-Hop nötig | nein | nein | **ja (Console)** | nein | **ja (nur Package)** |
+| Microsoft-supported | ✅ | ✅ | ✅ | ⚠️ Views ja, Schema nein | ⚠️ Cmdlets ja, Package-Distribution semi-offiziell |
+| Latenz pro Poll | ~1-2s | ~1-2s | ~3-5s (Hop) | <500ms | ~3-5s (Hop) |
+| Ports nach außen | 443 | 443 | 5986 | 1433 | 5986 |
+| Setup-Aufwand | mittel | mittel | hoch | niedrig | mittel-hoch |
+| Berechtigungs-Granularität | RBAC AdminService | RBAC AdminService | volles MECM-RBAC | DB-Read | volles MECM-RBAC |
+| Cmdlet-Funktionsumfang | begrenzt (REST-Subset) | begrenzt (REST-Subset) | voll (`Get-CM*` etc.) | irrelevant (SQL) | voll (`Get-CM*` etc.) |
+| Min. MECM-Version | 1810 | 1810 | jede | jede (View-Stabilität CB-abhängig) | jede |
+| Risiko bei CM-Upgrade | gering | gering | gering | mittel (View-Schema) | mittel (Cmdlet-Compat im Package) |
+| Wartung Windows-Komponente | n/a | n/a | MS-Update-Pfad (MSI) | n/a | manuelle Package-Pflege |
 
 ---
 
-## Gemeinsamer Tofu-Flow (alle vier Wege)
+## Gemeinsamer Tofu-Flow (alle Wege)
 
 ```mermaid
 sequenceDiagram
@@ -178,9 +185,55 @@ Major-Upgrades ändern, separater Netzwerkpfad zur SQL.
 
 ---
 
+## Variante 05 — WinRM + exportiertes Cmdlet-Package
+
+```mermaid
+flowchart LR
+    subgraph Linux Runner
+        TF[OpenTofu] --> NR[null_resource]
+        NR --> PWSH[pwsh<br/>Wait-MecmDeployed.ps1]
+    end
+    subgraph Windows Worker-Host
+        WSMAN[WinRM<br/>HTTPS 5986]
+        PKG["Cmdlet-Package<br/>z.B. C:\Tools\PSCMDLets\<br/>(ConfigurationManager.psd1<br/>+ DLLs)"]
+        REMOTE[Get-MecmStatus.ps1<br/>Import-Module per Pfad<br/>SMS_ADMIN_UI_PATH gesetzt]
+        WSMAN --> REMOTE
+        REMOTE --> PKG
+    end
+    subgraph MECM
+        SP[SMS Provider<br/>WMI/DCOM]
+        SP --> DB[(CM_DB)]
+    end
+    PWSH -- New-PSSession<br/>Negotiate --> WSMAN
+    REMOTE -- New-PSDrive CMSite<br/>Get-CMDevice etc. --> SP
+```
+
+**Konzept:** Wie Variante 03, aber der Windows-Host braucht **keine
+vollständige Admin-Console-Installation** — nur das exportierte Cmdlet-Package
+in einem beliebigen Ordner. Setup einmalig per `Setup-CmdletPackage.ps1`:
+
+```powershell
+Import-Module C:\Tools\PSCMDLets\ConfigurationManager.psd1
+$env:SMS_ADMIN_UI_PATH = 'C:\Tools\PSCMDLets'
+New-PSDrive -Name <SiteCode> -PSProvider CMSite -Root <sms-provider-fqdn>
+```
+
+**Package-Beschaffung:** Microsoft liefert das Package nicht direkt. Üblich:
+selbst erzeugen via [garytown — CreateCMPowerShellModulePackage.ps1](https://github.com/gwblok/garytown/blob/master/CreateCMPowerShellModulePackage.ps1)
+oder Inhalt aus `…\AdminUI\bin\` einer existierenden Installation
+extrahieren (siehe [garrettyamada-Artikel](https://garrettyamada.com/posts/connecting-to-sccm-using-powershell)).
+
+**Vorteile:** Voller Cmdlet-Zugriff wie Variante 03; minimaler Footprint
+auf dem Windows-Hop; mehrere Worker können dasselbe Package nutzen.
+**Nachteile:** Package-Pflege manuell (kein Auto-Update via MSI); rechtlich/
+support-technisch eine Grauzone, da Package nicht offiziell distribuiert wird;
+Cmdlet-Compatibility nach CM-Upgrades selbst prüfen.
+
+---
+
 ## Auth-Flow (Linux → MECM)
 
-Gleich für Variante 01, 02, 04 (Kerberos) und sinngemäß für 03:
+Gleich für Variante 01, 02, 04 (Kerberos) und sinngemäß für 03/05:
 
 ```mermaid
 sequenceDiagram
