@@ -21,8 +21,11 @@ weiter `SCCM` oder `MECM`) zu lesen und OpenTofu darauf warten zu lassen.
   Check der 5 Wege gegen aktuelle ConfigMgr-Versionen (2503/2509/2603)
 - [`docs/auth-setup.md`](docs/auth-setup.md) — Konkretes Auth-Kochbuch:
   Service-Account, RBAC-Rolle, Keytab, krb5/CA-Trust auf Linux, Smoke-Tests
-- [`examples/basic-wait`](examples/basic-wait) — Tofu-Beispiel, das eine der
-  fünf Varianten als Modul einbindet und Folge-Resources daran hängt
+- [`examples/basic-wait`](examples/basic-wait) — minimales Tofu-Beispiel,
+  das eine der fünf Varianten als Modul einbindet
+- [`examples/full-vm-rollout`](examples/full-vm-rollout) — End-to-End-Pipeline:
+  VM-Provisioning → ConfigMgr-Wait → parallele Folge-Tasks (DNS, Monitoring,
+  CMDB) → Final-Notification
 
 | Ordner | Stack | Voraussetzungen | Stärke | Schwäche |
 |---|---|---|---|---|

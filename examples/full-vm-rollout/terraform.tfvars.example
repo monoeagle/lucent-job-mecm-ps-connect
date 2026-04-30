@@ -1,0 +1,18 @@
+# Kopiere diese Datei nach terraform.tfvars und passe die Werte an.
+# Pflicht-Variablen ohne Default:
+
+computer_name = "PC-DEMO-001"
+sms_provider  = "sccm.corp.local"
+site_code     = "P01"
+
+# Optional ueberschreibbar:
+
+# configmgr_timeout_seconds       = 7200
+# configmgr_poll_interval_seconds = 30
+# dns_zone                        = "corp.local"
+# monitoring_url                  = "https://monitoring.corp.local/api/v1/hosts"
+# cmdb_url                        = "https://cmdb.corp.local/api/v2/devices"
+# notify_channel                  = "#ops-rollout"
+
+# Im echten Betrieb auf false setzen:
+# dry_run = false
