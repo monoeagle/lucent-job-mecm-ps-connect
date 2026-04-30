@@ -24,3 +24,16 @@ auszuführen, das die CM-Console-DLLs lädt.
 ```bash
 pwsh ./Wait-ConfigMgrDeployed.ps1 -ComputerName PC123 -Jumphost cmjump01.corp.local -SiteCode P01
 ```
+
+## Als Tofu-Modul verwenden
+
+```hcl
+module "wait_for_pc" {
+  source        = "../../03-winrm-jumphost"
+  computer_name = "PC123"
+  jumphost      = "cmjump01.corp.local"
+  site_code     = "P01"
+}
+```
+
+Komplettes Beispiel: [`examples/basic-wait`](../examples/basic-wait).

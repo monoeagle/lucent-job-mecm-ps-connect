@@ -26,3 +26,17 @@ kinit -kt /etc/krb5.keytab svc-tofu@DOMAIN.LOCAL
 - `v_R_System` — Resource-Stammdaten, `Client0`-Spalte
 - `v_TaskExecutionStatus` — TS-Run-Historie pro Resource
 - `v_CH_ClientSummary` — Client-Health (optional ergänzend)
+
+## Als Tofu-Modul verwenden
+
+```hcl
+module "wait_for_pc" {
+  source        = "../../04-sql-direct"
+  computer_name = "PC123"
+  sql_host      = "sql.corp.local"
+  db_name       = "CM_P01"
+  # sql_user/sql_password optional fuer SQL-Auth statt Kerberos
+}
+```
+
+Komplettes Beispiel: [`examples/basic-wait`](../examples/basic-wait).

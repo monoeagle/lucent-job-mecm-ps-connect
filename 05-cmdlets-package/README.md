@@ -72,6 +72,21 @@ pwsh ./Wait-ConfigMgrDeployed.ps1 \
 - [garytown — ConfigMgr PowerShell Module Package](https://garytown.com/configmgr-powershell-module-package)
 - [garrettyamada — Connecting to SCCM using PowerShell](https://garrettyamada.com/posts/connecting-to-sccm-using-powershell)
 
+## Als Tofu-Modul verwenden
+
+```hcl
+module "wait_for_pc" {
+  source        = "../../05-cmdlets-package"
+  computer_name = "PC123"
+  windows_host  = "cmworker01.corp.local"
+  site_code     = "P01"
+  site_server   = "sccm.corp.local"
+  cmdlet_path   = "C:\\Tools\\PSCMDLets"   # default
+}
+```
+
+Komplettes Beispiel: [`examples/basic-wait`](../examples/basic-wait).
+
 ## Unterschied zu Variante 03
 
 | Aspekt | 03 (Console-Install) | 05 (Cmdlet-Package) |

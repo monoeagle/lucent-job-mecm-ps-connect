@@ -19,6 +19,10 @@ weiter `SCCM` oder `MECM`) zu lesen und OpenTofu darauf warten zu lassen.
   Versions-Schema, Release-Cadence, Stand 2026, Detektion
 - [`docs/compatibility-2026.md`](docs/compatibility-2026.md) — Kompatibilitäts-
   Check der 5 Wege gegen aktuelle ConfigMgr-Versionen (2503/2509/2603)
+- [`docs/auth-setup.md`](docs/auth-setup.md) — Konkretes Auth-Kochbuch:
+  Service-Account, RBAC-Rolle, Keytab, krb5/CA-Trust auf Linux, Smoke-Tests
+- [`examples/basic-wait`](examples/basic-wait) — Tofu-Beispiel, das eine der
+  fünf Varianten als Modul einbindet und Folge-Resources daran hängt
 
 | Ordner | Stack | Voraussetzungen | Stärke | Schwäche |
 |---|---|---|---|---|

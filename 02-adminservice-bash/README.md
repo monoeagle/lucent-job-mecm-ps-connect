@@ -21,6 +21,19 @@ kinit -kt /etc/krb5.keytab svc-tofu@DOMAIN.LOCAL
 ./wait-configmgr-deployed.sh PC123 sccm.corp.local P01
 ```
 
+## Als Tofu-Modul verwenden
+
+```hcl
+module "wait_for_pc" {
+  source        = "../../02-adminservice-bash"
+  computer_name = "PC123"
+  sms_provider  = "sccm.corp.local"
+  site_code     = "P01"
+}
+```
+
+Komplettes Beispiel: [`examples/basic-wait`](../examples/basic-wait).
+
 ## Weitere Demo-Skripte
 
 Im Unterordner [`Demo/`](Demo/) liegen 10 Skripte, die zeigen was sich noch

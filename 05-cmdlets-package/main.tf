@@ -1,12 +1,3 @@
-variable "computer_name" { type = string }
-variable "windows_host"  { type = string }
-variable "site_code"     { type = string }
-variable "site_server"   { type = string }
-variable "cmdlet_path"   {
-  type    = string
-  default = "C:\\Tools\\PSCMDLets"
-}
-
 resource "null_resource" "wait_for_configmgr" {
   triggers = {
     computer_name = var.computer_name
@@ -16,11 +7,13 @@ resource "null_resource" "wait_for_configmgr" {
     interpreter = ["/bin/bash", "-c"]
     command     = <<-EOT
       pwsh ${path.module}/Wait-ConfigMgrDeployed.ps1 \
-        -ComputerName ${var.computer_name} \
-        -WindowsHost  ${var.windows_host} \
-        -SiteCode     ${var.site_code} \
-        -SiteServer   ${var.site_server} \
-        -CmdletPath   '${var.cmdlet_path}'
+        -ComputerName         '${var.computer_name}' \
+        -WindowsHost          '${var.windows_host}' \
+        -SiteCode             '${var.site_code}' \
+        -SiteServer           '${var.site_server}' \
+        -CmdletPath           '${var.cmdlet_path}' \
+        -TimeoutSeconds       ${var.timeout_seconds} \
+        -PollIntervalSeconds  ${var.poll_interval_seconds}
     EOT
   }
 }

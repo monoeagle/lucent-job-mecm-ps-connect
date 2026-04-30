@@ -22,6 +22,24 @@ pwsh ./Wait-ConfigMgrDeployed.ps1 -ComputerName PC123 -SmsProvider sccm.corp.loc
 
 Exit-Code 0 = deployed, 1 = Timeout, 2 = Fehler.
 
+## Als Tofu-Modul verwenden
+
+Dieser Ordner ist ein vollständiges Tofu-Modul (`variables.tf`, `main.tf`,
+`outputs.tf`). Einbinden:
+
+```hcl
+module "wait_for_pc" {
+  source                = "../../01-adminservice-pwsh"
+  computer_name         = "PC123"
+  sms_provider          = "sccm.corp.local"
+  site_code             = "P01"
+  timeout_seconds       = 7200    # optional, Default 3600
+  poll_interval_seconds = 60      # optional, Default 30
+}
+```
+
+Komplettes Beispiel: [`examples/basic-wait`](../examples/basic-wait).
+
 ## Weitere Demo-Skripte
 
 Im Unterordner [`Demo/`](Demo/) liegen 10 Skripte, die zeigen was sich noch
