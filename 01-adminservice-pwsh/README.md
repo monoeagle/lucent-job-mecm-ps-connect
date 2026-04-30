@@ -48,8 +48,11 @@ will, findet eine 5.1-kompatible Variante in
 
 ## Weitere Demo-Skripte
 
-Im Unterordner [`Demo/`](Demo/) liegen 10 Skripte, die zeigen was sich noch
-alles ueber den AdminService abfragen laesst (Devices, Hardware-/Software-
-Inventory, Collections, Deployments, Task-Sequence-Status, Client-Health,
-Klassen-Discovery, modeled `/v1.0/`-API). Siehe
-[`Demo/Übersicht.md`](Demo/Übersicht.md).
+Im Unterordner [`Demo-pwsh7/`](Demo-pwsh7/) liegen 10 Skripte, die zeigen was
+sich noch alles ueber den AdminService abfragen laesst (Devices, Hardware-/
+Software-Inventory, Collections, Deployments, Task-Sequence-Status,
+Client-Health, Klassen-Discovery, modeled `/v1.0/`-API). Siehe
+[`Demo-pwsh7/Übersicht.md`](Demo-pwsh7/Übersicht.md).
+
+Eine 5.1-kompatible Variante derselben Demos liegt unter
+[`windows-pwsh5/Demo/`](windows-pwsh5/Demo/).
