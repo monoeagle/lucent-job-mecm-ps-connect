@@ -21,3 +21,11 @@ pwsh ./Wait-ConfigMgrDeployed.ps1 -ComputerName PC123 -SmsProvider sccm.corp.loc
 ```
 
 Exit-Code 0 = deployed, 1 = Timeout, 2 = Fehler.
+
+## Weitere Demo-Skripte
+
+Im Unterordner [`Demo/`](Demo/) liegen 10 Skripte, die zeigen was sich noch
+alles ueber den AdminService abfragen laesst (Devices, Hardware-/Software-
+Inventory, Collections, Deployments, Task-Sequence-Status, Client-Health,
+Klassen-Discovery, modeled `/v1.0/`-API). Siehe
+[`Demo/Übersicht.md`](Demo/Übersicht.md).

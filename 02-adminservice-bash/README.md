@@ -20,3 +20,11 @@ Wie 01, aber ohne PowerShell-Dependency. Pure Bash, `curl` mit Kerberos und `jq`
 kinit -kt /etc/krb5.keytab svc-tofu@DOMAIN.LOCAL
 ./wait-configmgr-deployed.sh PC123 sccm.corp.local P01
 ```
+
+## Weitere Demo-Skripte
+
+Im Unterordner [`Demo/`](Demo/) liegen 10 Skripte, die zeigen was sich noch
+alles ueber den AdminService abfragen laesst (Devices, Hardware-/Software-
+Inventory, Collections, Deployments, Task-Sequence-Status, Client-Health,
+Klassen-Discovery, modeled `/v1.0/`-API). Siehe
+[`Demo/Übersicht.md`](Demo/Übersicht.md).
