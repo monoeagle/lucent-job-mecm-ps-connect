@@ -26,7 +26,7 @@ weiter `SCCM` oder `MECM`) zu lesen und OpenTofu darauf warten zu lassen.
 
 | Ordner | Stack | Voraussetzungen | Stärke | Schwäche |
 |---|---|---|---|---|
-| `01-adminservice-pwsh` | PowerShell 7 + AdminService REST | pwsh auf Runner, AdminService aktiv (CB 1810+), Kerberos-Keytab | Sauber, JSON-nativ, supported | pwsh-Dependency |
+| `01-adminservice-pwsh` | PowerShell 7 + AdminService REST (auch [5.1-Compat](01-adminservice-pwsh/windows-pwsh5/) verfügbar) | pwsh auf Runner, AdminService aktiv (CB 1810+), Kerberos-Keytab | Sauber, JSON-nativ, supported | pwsh-Dependency |
 | `02-adminservice-bash` | curl + jq + AdminService REST | curl, jq, kinit, AdminService aktiv | Keine pwsh-Dependency, leichtgewichtig | Mehr Bash-Glue für Fehler-Handling |
 | `03-winrm-jumphost` | pwsh → WinRM → Windows-Jumphost mit `ConfigurationManager`-Modul | pwsh-remoting, Jumphost mit Console | Voller Cmdlet-Zugriff, AdminService nicht nötig | Zwei-Hop-Auth, mehr Moving Parts |
 | `04-sql-direct` | sqlcmd (mssql-tools) gegen CM-DB Views | Read-Account auf `CM_<Site>`, Netzwerkpfad zu SQL | Schnellste Queries, beste für komplexe Joins | Nur Read, DBA-Approval nötig, brittler bei CM-Upgrades |

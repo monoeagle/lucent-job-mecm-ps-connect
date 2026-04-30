@@ -72,6 +72,12 @@ pwsh ./Wait-ConfigMgrDeployed.ps1 \
 - [garytown — ConfigMgr PowerShell Module Package](https://garytown.com/configmgr-powershell-module-package)
 - [garrettyamada — Connecting to SCCM using PowerShell](https://garrettyamada.com/posts/connecting-to-sccm-using-powershell)
 
+## Windows PowerShell 5.1
+
+5.1-kompatible Variante des Wait-Skripts unter
+[`windows-pwsh5/`](windows-pwsh5/README.md). Die Windows-Host-Skripte
+in `windows/` sind ohnehin 5.1-kompatibel.
+
 ## Als Tofu-Modul verwenden
 
 ```hcl

@@ -25,6 +25,12 @@ auszuführen, das die CM-Console-DLLs lädt.
 pwsh ./Wait-ConfigMgrDeployed.ps1 -ComputerName PC123 -Jumphost cmjump01.corp.local -SiteCode P01
 ```
 
+## Windows PowerShell 5.1
+
+5.1-kompatible Variante des Wait-Skripts unter
+[`windows-pwsh5/`](windows-pwsh5/README.md). Die Jumphost-Skripte
+selbst sind ohnehin 5.1-kompatibel.
+
 ## Als Tofu-Modul verwenden
 
 ```hcl

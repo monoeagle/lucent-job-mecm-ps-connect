@@ -40,6 +40,12 @@ module "wait_for_pc" {
 
 Komplettes Beispiel: [`examples/basic-wait`](../examples/basic-wait).
 
+## Windows PowerShell 5.1
+
+Wer die Skripte auf einer Windows-Workstation ohne pwsh-7-Install nutzen
+will, findet eine 5.1-kompatible Variante in
+[`windows-pwsh5/`](windows-pwsh5/README.md). Funktional identisch.
+
 ## Weitere Demo-Skripte
 
 Im Unterordner [`Demo/`](Demo/) liegen 10 Skripte, die zeigen was sich noch
