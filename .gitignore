@@ -1,0 +1,5 @@
+
+# .claude/ — User-/Machine-spezifisches ignorieren, Project-Customizations tracken
+.claude/settings.local.json
+.claude/agent-memory/
+.claude/projects/
