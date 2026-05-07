@@ -192,6 +192,80 @@ Der Service-Account hat keine ConfigMgr-RBAC-Rolle. Mindestanforderung:
 - Rolle: `Read-only Analyst`
 - Scope: `All instances` (oder eingeschränkter Scope auf relevante Collections)
 
+### AdminService-Anwendung fehlt im IIS (404 / keine Seite sichtbar)
+
+Wenn in IIS Manager unter "Default Web Site" keine `AdminService`-Anwendung
+erscheint — oder die "Default Web Site" selbst fehlt — gibt es drei mögliche
+Ursachen:
+
+**a) eHTTP gerade erst aktiviert — noch nicht deployed**
+
+MECM deployed die IIS-Anwendung asynchron nach dem Speichern der
+Communication-Security-Einstellung. Auf dem Site-Server `sitecomp.log`
+beobachten:
+
+```powershell
+Get-Content "C:\Program Files\Microsoft Configuration Manager\Logs\sitecomp.log" -Wait -Tail 30
+```
+
+Zeilen die auf erfolgreiche Einrichtung hindeuten:
+
+```
+Installing SMS_REST_PROVIDER ...
+SMS_REST_PROVIDER installed successfully
+```
+
+Wenn diese Zeilen erscheinen, danach nochmals IIS Manager neu laden (F5).
+
+**b) IIS-Rolle fehlt auf dem Server**
+
+Der AdminService setzt IIS voraus. Prüfen ob IIS installiert ist:
+
+```powershell
+Get-WindowsFeature -Name Web-Server, Web-Asp-Net45, Web-Windows-Auth |
+    Select-Object Name, InstallState
+```
+
+Alle drei müssen `Installed` sein. Falls nicht:
+
+```powershell
+Install-WindowsFeature -Name Web-Server, Web-Asp-Net45, Web-Windows-Auth -IncludeManagementTools
+```
+
+Anschließend auf dem MECM-Server den Site-Component-Manager-Dienst neu
+starten, damit MECM die IIS-Konfiguration erneut ausrollt:
+
+```powershell
+Restart-Service SMS_SITE_COMPONENT_MANAGER
+```
+
+Danach wieder `sitecomp.log` beobachten.
+
+**c) SMS-Provider-Rolle defekt oder nie installiert**
+
+Wenn IIS vorhanden ist, aber die Anwendung dauerhaft fehlt (auch nach
+Warten und Log-Prüfung), muss die SMS-Provider-Rolle repariert werden:
+
+1. MECM-Konsole → **Administration → Site Configuration → Servers and
+   Site System Roles**
+2. Den betroffenen Server auswählen
+3. Rechtsklick auf **SMS Provider** → **Remove Role**
+4. Kurz warten, dann erneut Rechtsklick auf den Server →
+   **Add Site System Roles** → SMS Provider hinzufügen
+5. Wizard durchlaufen, danach `sitecomp.log` beobachten
+
+Alternativ: MECM-Setup im Repair-Modus ausführen:
+
+```
+C:\Program Files\Microsoft Configuration Manager\bin\X64\setup.exe
+→ "Perform site maintenance or reset this site"
+→ "Reset site with no configuration changes"
+```
+
+Das repariert IIS-Bindings und Anwendungen ohne Konfigurationsverlust.
+
+---
+
 ### Zertifikat wird vom Linux-Client nicht akzeptiert
 
 Das selbstsignierte Zertifikat der internen CA muss dem System-Trust-Store
