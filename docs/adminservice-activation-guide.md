@@ -174,6 +174,62 @@ Die Site ist möglicherweise bereits auf **HTTPS only** konfiguriert — dann
 ist eHTTP nicht nötig, der AdminService läuft bereits. Testweise
 `curl -k -I https://<fqdn>/AdminService/` ausführen.
 
+### Dienst SMS_REST_PROVIDER existiert nicht (nicht nur gestoppt, sondern gar nicht vorhanden)
+
+Das bedeutet, dass die SMS-Provider-Rolle auf diesem Server entweder nie
+vollständig installiert wurde oder die MECM-Version älter als CB 1810 ist.
+
+**Diagnose — Schritt für Schritt:**
+
+```powershell
+# 1. Existiert der Dienst überhaupt?
+Get-Service -Name SMS_REST_PROVIDER -ErrorAction SilentlyContinue
+# Kein Output → Dienst nicht installiert
+
+# 2. MECM-Version prüfen (muss 1810 oder neuer sein)
+Get-ItemProperty "HKLM:\SOFTWARE\Microsoft\SMS\Setup" | Select-Object "Full Version"
+
+# 3. Ist die SMS-Provider-Rolle auf diesem Server registriert?
+Get-ItemProperty "HKLM:\SOFTWARE\Microsoft\SMS\Providers" -ErrorAction SilentlyContinue
+# Kein Ergebnis → SMS Provider nicht auf diesem Server installiert
+```
+
+**Fall A — MECM-Version älter als 1810**
+
+Der AdminService existiert nicht. Einziger Fix: MECM auf CB 1810 oder neuer
+aktualisieren. Bis dahin Variante 04, 05, 06 oder 07 aus der OVERVIEW nutzen.
+
+**Fall B — SMS-Provider-Rolle nicht auf diesem Server installiert**
+
+Die Rolle muss erst hinzugefügt werden:
+
+1. MECM-Konsole → **Administration → Site Configuration →
+   Servers and Site System Roles**
+2. Rechtsklick auf den gewünschten Server →
+   **Add Site System Roles**
+3. Im Wizard **SMS Provider** anhaken → Wizard abschließen
+4. `sitecomp.log` beobachten bis die Rolle als installiert gemeldet wird
+5. Danach `Get-Service SMS_REST_PROVIDER` erneut prüfen
+
+**Fall C — Rolle laut Konsole installiert, Dienst aber trotzdem fehlt**
+
+Die Installation ist inkonsistent. MECM-Setup im Repair-Modus ausführen:
+
+```
+C:\Program Files\Microsoft Configuration Manager\bin\X64\setup.exe
+→ "Perform site maintenance or reset this site"
+→ "Reset site with no configuration changes"
+```
+
+Nach dem Repair:
+
+```powershell
+# Dienst sollte jetzt existieren und laufen
+Get-Service SMS_REST_PROVIDER
+```
+
+---
+
 ### HTTP 403 nach eHTTP-Aktivierung
 
 IIS hat das neue Zertifikat noch nicht gebunden. Warten (bis 5 min) oder
