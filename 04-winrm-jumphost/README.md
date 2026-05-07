@@ -1,4 +1,4 @@
-# 03 — WinRM-Jumphost mit ConfigurationManager-Modul
+# 04 — WinRM-Jumphost mit ConfigurationManager-Modul
 
 Wenn AdminService nicht aktiviert ist oder das CM-Modul mit den vollen Cmdlets
 benötigt wird (z.B. `Get-CMDeviceCollectionMembership`-Logik), nutzt der
@@ -44,7 +44,7 @@ selbst sind ohnehin 5.1-kompatibel.
 
 ```hcl
 module "wait_for_pc" {
-  source        = "../../03-winrm-jumphost"
+  source        = "../../04-winrm-jumphost"
   computer_name = "PC123"
   jumphost      = "cmjump01.corp.local"
   site_code     = "P01"

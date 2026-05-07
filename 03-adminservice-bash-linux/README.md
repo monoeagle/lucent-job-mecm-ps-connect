@@ -1,6 +1,7 @@
-# 02 — AdminService via Bash + curl
+# 03 — AdminService via Bash + curl (Linux)
 
 Wie 01, aber ohne PowerShell-Dependency. Pure Bash, `curl` mit Kerberos und `jq`.
+Rein Linux — kein Windows-Pendant (kein natives bash).
 
 ## Voraussetzungen
 
@@ -25,7 +26,7 @@ kinit -kt /etc/krb5.keytab svc-tofu@DOMAIN.LOCAL
 
 ```hcl
 module "wait_for_pc" {
-  source        = "../../02-adminservice-bash"
+  source        = "../../03-adminservice-bash-linux"
   computer_name = "PC123"
   sms_provider  = "sccm.corp.local"
   site_code     = "P01"

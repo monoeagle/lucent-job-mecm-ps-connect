@@ -174,14 +174,14 @@ sind dokumentiert, aber nicht formal versioniert.
 **Diagnose:**
 ```bash
 # Aktuelles Schema gegen die genutzte Spalte
-./04-sql-direct/Demo/090-discover-views.sh v_R_System schema | grep <SpaltenName>
+./05-sql-direct-linux/Demo/090-discover-views.sh v_R_System schema | grep <SpaltenName>
 ```
 
 **Fix:** Query an neues Schema anpassen. Pflicht-Hygiene: pro Major-
 Upgrade einmal die genutzten Spalten gegen das aktuelle Schema laufen
 lassen.
 
-### 2.4 Cmdlet-Package: `Version mismatch` (Variante 05)
+### 2.4 Cmdlet-Package: `Version mismatch` (Variante 07)
 
 **Symptom:** `Get-CMDevice` wirft Versionsfehler beim ersten Cmdlet-
 Aufruf.
@@ -193,7 +193,7 @@ beim Start.
 **Fix:** Package aus einer Console mit passender Version neu erzeugen
 (siehe garytown-CreateCMPowerShellModulePackage.ps1).
 
-### 2.5 `Get-CMDevice` ist langsam (Variante 03/05)
+### 2.5 `Get-CMDevice` ist langsam (Variante 04/07)
 
 **Symptom:** `Get-CMDevice` braucht Minuten fuer eine Liste.
 
@@ -219,7 +219,7 @@ laeuft bis Timeout.
 
 **Diagnose:** Gleiches Skript mit Verbose ausfuehren:
 ```bash
-pwsh ./01-adminservice-pwsh/Wait-ConfigMgrDeployed.ps1 \
+pwsh ./01-adminservice-pwsh-linux/Wait-ConfigMgrDeployed.ps1 \
     -ComputerName PC123 -SmsProvider sccm.corp.local -SiteCode P01 \
     -TimeoutSeconds 60 -Verbose
 ```
@@ -232,7 +232,7 @@ bei Hostname-Mismatch die Tofu-Variable korrigieren.
 ### 3.2 Tofu wirft `Failed to install module`
 
 **Symptom:** `tofu init` in `examples/full-vm-rollout/` schlaegt fehl mit
-`Could not load module "../../01-adminservice-pwsh"`.
+`Could not load module "../../01-adminservice-pwsh-linux"`.
 
 **Ursache:** Module-Source-Pfad relativ zum aufrufenden Projekt-Root,
 nicht zur main.tf.
@@ -278,7 +278,7 @@ Terraform Cloud). Niemals File-Backend in Multi-User-Setups.
 
 **Fix:** 5.1-Compat-Variante aus `windows-pwsh5/`-Folder benutzen, oder
 `if/else`-Workaround. Patterns in
-[`01-adminservice-pwsh/windows-pwsh5/README.md`](../01-adminservice-pwsh/windows-pwsh5/README.md).
+[`01-adminservice-pwsh-linux/windows-pwsh5/README.md`](../01-adminservice-pwsh-linux/windows-pwsh5/README.md) oder Block `02-adminservice-pwsh-windows` nutzen.
 
 ### 4.2 Bash: `$'\r': command not found`
 

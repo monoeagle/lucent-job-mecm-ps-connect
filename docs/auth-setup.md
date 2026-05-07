@@ -190,7 +190,7 @@ curl --negotiate -u : -H 'Accept: application/json' \
 
 # 5f. Demo-Skript fahren
 export CONFIGMGR_ADMINSERVICE_BASE='https://sccm.corp.local/AdminService'
-./01-adminservice-pwsh/Demo-pwsh7/010-list-devices.ps1 -Top 5
+./01-adminservice-pwsh-linux/Demo-pwsh7/010-list-devices.ps1 -Top 5
 ```
 
 ## 6. Troubleshooting

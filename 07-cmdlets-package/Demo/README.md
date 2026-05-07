@@ -1,9 +1,9 @@
 # Demo-Skripte — Cmdlet-Package
 
-Variante 05 nutzt **dieselben ConfigurationManager-Cmdlets** wie Variante 03,
+Variante 07 nutzt **dieselben ConfigurationManager-Cmdlets** wie Variante 04,
 nur mit anderem Setup (Cmdlet-Package geladen statt voller Console-Install).
 Die Demo-Skripte sind deshalb **identisch** und liegen in
-[`../03-winrm-jumphost/Demo/`](../../03-winrm-jumphost/Demo).
+[`../04-winrm-jumphost/Demo/`](../../04-winrm-jumphost/Demo).
 
 ## Setup vor Demo-Aufruf
 
@@ -21,8 +21,8 @@ $env:CONFIGMGR_SITE_CODE   = 'P01'
 $env:CONFIGMGR_SITE_SERVER = 'sccm.corp.local'
 
 # 3. Demos aus 03/Demo/ aufrufen:
-& "..\..\03-winrm-jumphost\Demo\010-list-devices.ps1"
-& "..\..\03-winrm-jumphost\Demo\020-device-full.ps1" -ComputerName PC123
+& "..\..\04-winrm-jumphost\Demo\010-list-devices.ps1"
+& "..\..\04-winrm-jumphost\Demo\020-device-full.ps1" -ComputerName PC123
 # ...
 ```
 
@@ -30,8 +30,8 @@ $env:CONFIGMGR_SITE_SERVER = 'sccm.corp.local'
 
 Die Cmdlet-API ist nach Setup-Schritt 1 voellig identisch — Duplizieren
 brachte nur Maintenance-Schmerz. Die einzige Sub-Variante ist der
-Initial-Load in Schritt 1: in 03 macht das die installierte Console
-implizit, in 05 expliziterweise das `Setup-CmdletPackage.ps1`.
+Initial-Load in Schritt 1: in 04 macht das die installierte Console
+implizit, in 07 expliziterweise das `Setup-CmdletPackage.ps1`.
 
 ## Wenn lokale Demo-Kopien gewuenscht sind
 
@@ -40,7 +40,7 @@ Optionaler Convenience-Ordner kann angelegt werden:
 ```powershell
 # Einmalig:
 mkdir Demo\local
-Copy-Item ..\..\03-winrm-jumphost\Demo\*.ps1 Demo\local\
+Copy-Item ..\..\04-winrm-jumphost\Demo\*.ps1 Demo\local\
 # Danach setzen + sourcen wie oben, aufrufen aus Demo\local\
 ```
 

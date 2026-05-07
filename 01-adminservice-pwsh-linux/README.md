@@ -1,6 +1,7 @@
-# 01 — AdminService via PowerShell 7
+# 01 — AdminService via PowerShell (Linux)
 
 Linux-Runner ruft die AdminService REST API von ConfigMgr direkt mit `Invoke-RestMethod` auf.
+Authentifizierung via Kerberos (kinit + Keytab).
 
 ## Voraussetzungen
 
@@ -29,7 +30,7 @@ Dieser Ordner ist ein vollständiges Tofu-Modul (`variables.tf`, `main.tf`,
 
 ```hcl
 module "wait_for_pc" {
-  source                = "../../01-adminservice-pwsh"
+  source                = "../../01-adminservice-pwsh-linux"
   computer_name         = "PC123"
   sms_provider          = "sccm.corp.local"
   site_code             = "P01"
@@ -40,11 +41,11 @@ module "wait_for_pc" {
 
 Komplettes Beispiel: [`examples/basic-wait`](../examples/basic-wait).
 
-## Windows PowerShell 5.1
+## Windows-Variante
 
-Wer die Skripte auf einer Windows-Workstation ohne pwsh-7-Install nutzen
-will, findet eine 5.1-kompatible Variante in
-[`windows-pwsh5/`](windows-pwsh5/README.md). Funktional identisch.
+Für Windows-Maschinen (PS 5.1, SSPI statt Kerberos) gibt es den eigenständigen
+Block [`02-adminservice-pwsh-windows`](../02-adminservice-pwsh-windows/README.md).
+Der `windows-pwsh5/`-Unterordner hier bleibt als Referenz erhalten.
 
 ## Weitere Demo-Skripte
 
@@ -53,6 +54,3 @@ sich noch alles ueber den AdminService abfragen laesst (Devices, Hardware-/
 Software-Inventory, Collections, Deployments, Task-Sequence-Status,
 Client-Health, Klassen-Discovery, modeled `/v1.0/`-API). Siehe
 [`Demo-pwsh7/Übersicht.md`](Demo-pwsh7/Übersicht.md).
-
-Eine 5.1-kompatible Variante derselben Demos liegt unter
-[`windows-pwsh5/Demo/`](windows-pwsh5/Demo/).

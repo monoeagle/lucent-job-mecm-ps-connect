@@ -125,7 +125,7 @@ Tabelle unten.
 | Stage | Aktuell (Demo) | Real-Provider-Beispiele |
 |---|---|---|
 | 1 VM-Create | `null_resource` + `01-create-vm.sh` | `vsphere_virtual_machine`, `libvirt_domain`, `proxmox_vm_qemu`, `aws_instance`, `azurerm_virtual_machine` |
-| 2 ConfigMgr-Wait | `module.wait_for_configmgr` (= 01-adminservice-pwsh) | bleibt — oder Modul-Source auf 02/03/04/05 wechseln |
+| 2 ConfigMgr-Wait | `module.wait_for_configmgr` (= 01-adminservice-pwsh-linux) | bleibt — oder Modul-Source auf 02/03/04/05/06/07 wechseln |
 | 3a DNS | `null_resource` + `03a-add-dns.sh` | `cloudflare_record`, `powerdns_record`, `dns_a_record_set`, `infoblox_a_record`, `aws_route53_record` |
 | 3b Monitoring | `null_resource` + `03b-register-monitoring.sh` | `icinga2`-API, `datadog_host`, `zabbix_host`, Prometheus `file_sd` |
 | 3c CMDB | `null_resource` + `03c-update-cmdb.sh` | ServiceNow REST, iTop REST, `netbox_device`, `snipeit`-API |

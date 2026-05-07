@@ -32,7 +32,7 @@ resource "null_resource" "stage1_vm_create" {
 # Hostname, ist nicht in der Domain, hat keinen Monitoring-Agent etc.
 
 module "wait_for_configmgr" {
-  source = "../../01-adminservice-pwsh"
+  source = "../../01-adminservice-pwsh-linux"
 
   computer_name         = var.computer_name
   sms_provider          = var.sms_provider

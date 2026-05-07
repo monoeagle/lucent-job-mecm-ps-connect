@@ -1,6 +1,6 @@
-# 05 — Cmdlet-Package via WinRM
+# 07 — Cmdlet-Package via WinRM
 
-Wie Variante 03 (Linux → WinRM → Windows-Host mit `ConfigurationManager`-
+Wie Variante 04 (Linux → WinRM → Windows-Host mit `ConfigurationManager`-
 Modul), **aber ohne vollständige ConfigMgr-Admin-Console-Installation auf dem
 Windows-Host**. Stattdessen wird ein vorab exportiertes Cmdlet-Package
 bereitgestellt und via Pfad-/Env-Variable geladen.
@@ -74,7 +74,7 @@ pwsh ./Wait-ConfigMgrDeployed.ps1 \
 
 ## Demo-Skripte
 
-Identisch zu Variante 03 — siehe [`Demo/README.md`](Demo/README.md) fuer
+Identisch zu Variante 04 — siehe [`Demo/README.md`](Demo/README.md) fuer
 den Setup-Unterschied (Cmdlet-Package laden statt Console-Install).
 
 ## Windows PowerShell 5.1
@@ -87,7 +87,7 @@ in `windows/` sind ohnehin 5.1-kompatibel.
 
 ```hcl
 module "wait_for_pc" {
-  source        = "../../05-cmdlets-package"
+  source        = "../../07-cmdlets-package"
   computer_name = "PC123"
   windows_host  = "cmworker01.corp.local"
   site_code     = "P01"
@@ -100,7 +100,7 @@ Komplettes Beispiel: [`examples/basic-wait`](../examples/basic-wait).
 
 ## Unterschied zu Variante 03
 
-| Aspekt | 03 (Console-Install) | 05 (Cmdlet-Package) |
+| Aspekt | 04 (Console-Install) | 07 (Cmdlet-Package) |
 |---|---|---|
 | Windows-Host-Setup | MSI-Install der Console | Ordner kopieren |
 | Software-Lifecycle | MS-Update-Pfad | manuell aktualisiertes Package |

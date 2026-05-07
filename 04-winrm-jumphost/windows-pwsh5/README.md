@@ -1,4 +1,4 @@
-# Windows PowerShell 5.1 — Compat-Zweig (Variante 03)
+# Windows PowerShell 5.1 — Compat-Zweig (Variante 04)
 
 `Wait-ConfigMgrDeployed.ps1` lauffaehig in Windows PowerShell 5.1 — primaer
 fuer Tests von einer Windows-Admin-Workstation aus, ohne pwsh-7-Install.

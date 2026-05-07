@@ -1,7 +1,8 @@
-# 04 — Direkt gegen die CM-SQL-DB
+# 05 — SQL direkt gegen die CM-DB (Linux)
 
 Schnellster Weg, am wenigsten "ConfigMgr-konform". Nutzt die offiziell dokumentierten
 `v_*`-Views in `CM_<SiteCode>`. Read-only, niemals schreiben.
+Rein Linux — für Windows gibt es Block `06-sql-direct-windows` mit `Invoke-Sqlcmd`.
 
 ## Voraussetzungen
 
@@ -38,7 +39,7 @@ Aggregationen). Siehe [`Demo/Übersicht.md`](Demo/Übersicht.md).
 
 ```hcl
 module "wait_for_pc" {
-  source        = "../../04-sql-direct"
+  source        = "../../05-sql-direct-linux"
   computer_name = "PC123"
   sql_host      = "sql.corp.local"
   db_name       = "CM_P01"

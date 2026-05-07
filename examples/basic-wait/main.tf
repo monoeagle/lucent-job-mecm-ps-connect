@@ -8,7 +8,7 @@ terraform {
 # Tausche `source` und Variablen je nach gewaehltem Weg (siehe README.md).
 
 module "wait_for_pc" {
-  source = "../../01-adminservice-pwsh"
+  source = "../../01-adminservice-pwsh-linux"
 
   computer_name         = "PC123"
   sms_provider          = "sccm.corp.local"
