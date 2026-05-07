@@ -185,14 +185,70 @@ vollständig installiert wurde oder die MECM-Version älter als CB 1810 ist.
 # 1. Existiert der Dienst überhaupt?
 Get-Service -Name SMS_REST_PROVIDER -ErrorAction SilentlyContinue
 # Kein Output → Dienst nicht installiert
-
-# 2. MECM-Version prüfen (muss 1810 oder neuer sein)
-Get-ItemProperty "HKLM:\SOFTWARE\Microsoft\SMS\Setup" | Select-Object "Full Version"
-
-# 3. Ist die SMS-Provider-Rolle auf diesem Server registriert?
-Get-ItemProperty "HKLM:\SOFTWARE\Microsoft\SMS\Providers" -ErrorAction SilentlyContinue
-# Kein Ergebnis → SMS Provider nicht auf diesem Server installiert
 ```
+
+Wenn der Dienst fehlt, folgende drei Registry-Stellen prüfen:
+
+---
+
+#### Registry-Key 1 — MECM-Version
+
+```
+HKLM:\SOFTWARE\Microsoft\SMS\Setup
+```
+
+```powershell
+Get-ItemProperty "HKLM:\SOFTWARE\Microsoft\SMS\Setup" |
+    Select-Object "Full Version", "Installation Directory", "SMS Provider Location"
+```
+
+| Wert | Bedeutung |
+|---|---|
+| `Full Version` | MECM-Versionsnummer, z. B. `5.00.9068.1000` → CB 2303. Muss ≥ `5.00.8740.1000` (CB 1810) sein. |
+| `Installation Directory` | Installationspfad, bestätigt dass MECM auf diesem Server liegt |
+| `SMS Provider Location` | FQDN des SMS-Provider-Servers — wichtig wenn Provider auf separatem Server läuft |
+
+Wenn dieser Key **nicht existiert**: MECM ist auf diesem Server gar nicht installiert.
+Den richtigen Server suchen (meist der Site-Server selbst oder ein dedizierter Provider-Server).
+
+---
+
+#### Registry-Key 2 — SMS Provider registriert?
+
+```
+HKLM:\SOFTWARE\Microsoft\SMS\Providers
+```
+
+```powershell
+Get-ItemProperty "HKLM:\SOFTWARE\Microsoft\SMS\Providers" -ErrorAction SilentlyContinue
+```
+
+| Ergebnis | Bedeutung |
+|---|---|
+| Key existiert, enthält Werte | SMS Provider ist auf diesem Server installiert |
+| Key fehlt | SMS Provider **nicht** auf diesem Server — Rolle muss erst hinzugefügt werden (Fall B) |
+
+Typische Werte im Key: `Machine` (Servername), `Namespace` (WMI-Namespace der Site).
+
+---
+
+#### Registry-Key 3 — REST-Provider-Dienst registriert?
+
+```
+HKLM:\SYSTEM\CurrentControlSet\Services\SMS_REST_PROVIDER
+```
+
+```powershell
+Test-Path "HKLM:\SYSTEM\CurrentControlSet\Services\SMS_REST_PROVIDER"
+# True  → Dienst ist in Windows registriert (auch wenn er gestoppt ist)
+# False → Dienst wurde nie installiert
+```
+
+| Kombination | Bedeutung |
+|---|---|
+| Key 2 vorhanden, Key 3 fehlt | SMS Provider da, aber REST-Dienst nie deployt → eHTTP war nie aktiv oder Setup unvollständig → Repair |
+| Beide fehlen | SMS Provider nicht installiert → Rolle hinzufügen (Fall B) |
+| Key 3 vorhanden, Dienst trotzdem nicht startbar | Binaries fehlen oder beschädigt → Repair |
 
 **Fall A — MECM-Version älter als 1810**
 
