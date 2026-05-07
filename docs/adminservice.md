@@ -59,6 +59,10 @@ Der AdminService ist **nicht standardmäßig aktiv** — er wird zwar mit der
 SMS-Provider-Rolle installiert, antwortet aber erst, wenn Enhanced HTTP oder
 PKI-HTTPS konfiguriert ist.
 
+> Detaillierte Schritt-für-Schritt-Anleitung mit Screenshots-Beschreibungen,
+> Log-Dateien und Stolperfallen:
+> **[adminservice-activation-guide.md](adminservice-activation-guide.md)**
+
 ### Schritt 1 — Enhanced HTTP aktivieren
 
 **Administration → Site Configuration → Sites → [Site auswählen] →
