@@ -161,7 +161,7 @@ curl -k -I https://<sms-provider-fqdn>/AdminService/
 
 ---
 
-## Häufige Stolperfallen
+## Troubleshooting
 
 ### "Communication Security"-Reiter fehlt
 
@@ -173,118 +173,6 @@ Site ausgewählt hat. eHTTP muss auf der **Primary Site** aktiviert werden.
 Die Site ist möglicherweise bereits auf **HTTPS only** konfiguriert — dann
 ist eHTTP nicht nötig, der AdminService läuft bereits. Testweise
 `curl -k -I https://<fqdn>/AdminService/` ausführen.
-
-### Dienst SMS_REST_PROVIDER existiert nicht (nicht nur gestoppt, sondern gar nicht vorhanden)
-
-Das bedeutet, dass die SMS-Provider-Rolle auf diesem Server entweder nie
-vollständig installiert wurde oder die MECM-Version älter als CB 1810 ist.
-
-**Diagnose — Schritt für Schritt:**
-
-```powershell
-# 1. Existiert der Dienst überhaupt?
-Get-Service -Name SMS_REST_PROVIDER -ErrorAction SilentlyContinue
-# Kein Output → Dienst nicht installiert
-```
-
-Wenn der Dienst fehlt, folgende drei Registry-Stellen prüfen:
-
----
-
-#### Registry-Key 1 — MECM-Version
-
-```
-HKLM:\SOFTWARE\Microsoft\SMS\Setup
-```
-
-```powershell
-Get-ItemProperty "HKLM:\SOFTWARE\Microsoft\SMS\Setup" |
-    Select-Object "Full Version", "Installation Directory", "SMS Provider Location"
-```
-
-| Wert | Bedeutung |
-|---|---|
-| `Full Version` | MECM-Versionsnummer, z. B. `5.00.9068.1000` → CB 2303. Muss ≥ `5.00.8740.1000` (CB 1810) sein. |
-| `Installation Directory` | Installationspfad, bestätigt dass MECM auf diesem Server liegt |
-| `SMS Provider Location` | FQDN des SMS-Provider-Servers — wichtig wenn Provider auf separatem Server läuft |
-
-Wenn dieser Key **nicht existiert**: MECM ist auf diesem Server gar nicht installiert.
-Den richtigen Server suchen (meist der Site-Server selbst oder ein dedizierter Provider-Server).
-
----
-
-#### Registry-Key 2 — SMS Provider registriert?
-
-```
-HKLM:\SOFTWARE\Microsoft\SMS\Providers
-```
-
-```powershell
-Get-ItemProperty "HKLM:\SOFTWARE\Microsoft\SMS\Providers" -ErrorAction SilentlyContinue
-```
-
-| Ergebnis | Bedeutung |
-|---|---|
-| Key existiert, enthält Werte | SMS Provider ist auf diesem Server installiert |
-| Key fehlt | SMS Provider **nicht** auf diesem Server — Rolle muss erst hinzugefügt werden (Fall B) |
-
-Typische Werte im Key: `Machine` (Servername), `Namespace` (WMI-Namespace der Site).
-
----
-
-#### Registry-Key 3 — REST-Provider-Dienst registriert?
-
-```
-HKLM:\SYSTEM\CurrentControlSet\Services\SMS_REST_PROVIDER
-```
-
-```powershell
-Test-Path "HKLM:\SYSTEM\CurrentControlSet\Services\SMS_REST_PROVIDER"
-# True  → Dienst ist in Windows registriert (auch wenn er gestoppt ist)
-# False → Dienst wurde nie installiert
-```
-
-| Kombination | Bedeutung |
-|---|---|
-| Key 2 vorhanden, Key 3 fehlt | SMS Provider da, aber REST-Dienst nie deployt → eHTTP war nie aktiv oder Setup unvollständig → Repair |
-| Beide fehlen | SMS Provider nicht installiert → Rolle hinzufügen (Fall B) |
-| Key 3 vorhanden, Dienst trotzdem nicht startbar | Binaries fehlen oder beschädigt → Repair |
-
-**Fall A — MECM-Version älter als 1810**
-
-Der AdminService existiert nicht. Einziger Fix: MECM auf CB 1810 oder neuer
-aktualisieren. Bis dahin Variante 04, 05, 06 oder 07 aus der OVERVIEW nutzen.
-
-**Fall B — SMS-Provider-Rolle nicht auf diesem Server installiert**
-
-Die Rolle muss erst hinzugefügt werden:
-
-1. MECM-Konsole → **Administration → Site Configuration →
-   Servers and Site System Roles**
-2. Rechtsklick auf den gewünschten Server →
-   **Add Site System Roles**
-3. Im Wizard **SMS Provider** anhaken → Wizard abschließen
-4. `sitecomp.log` beobachten bis die Rolle als installiert gemeldet wird
-5. Danach `Get-Service SMS_REST_PROVIDER` erneut prüfen
-
-**Fall C — Rolle laut Konsole installiert, Dienst aber trotzdem fehlt**
-
-Die Installation ist inkonsistent. MECM-Setup im Repair-Modus ausführen:
-
-```
-C:\Program Files\Microsoft Configuration Manager\bin\X64\setup.exe
-→ "Perform site maintenance or reset this site"
-→ "Reset site with no configuration changes"
-```
-
-Nach dem Repair:
-
-```powershell
-# Dienst sollte jetzt existieren und laufen
-Get-Service SMS_REST_PROVIDER
-```
-
----
 
 ### HTTP 403 nach eHTTP-Aktivierung
 
@@ -304,69 +192,148 @@ Der Service-Account hat keine ConfigMgr-RBAC-Rolle. Mindestanforderung:
 - Rolle: `Read-only Analyst`
 - Scope: `All instances` (oder eingeschränkter Scope auf relevante Collections)
 
-### AdminService-Anwendung fehlt im IIS (404 / keine Seite sichtbar)
+### Zertifikat wird vom Linux-Client nicht akzeptiert
+
+Das selbstsignierte Zertifikat der internen CA muss dem System-Trust-Store
+hinzugefügt werden:
+
+```bash
+sudo cp interne-ca.crt /usr/local/share/ca-certificates/
+sudo update-ca-certificates
+```
+
+Für schnelle Tests: `curl -k` (nie in Produktion).
+
+---
+
+### AdminService-Anwendung fehlt im IIS (HTTP 404)
 
 Wenn in IIS Manager unter "Default Web Site" keine `AdminService`-Anwendung
-erscheint — oder die "Default Web Site" selbst fehlt — gibt es drei mögliche
-Ursachen:
-
-**a) eHTTP gerade erst aktiviert — noch nicht deployed**
-
-MECM deployed die IIS-Anwendung asynchron nach dem Speichern der
-Communication-Security-Einstellung. Auf dem Site-Server `sitecomp.log`
+erscheint, zuerst kurz warten (eHTTP deployt asynchron) und `sitecomp.log`
 beobachten:
 
 ```powershell
 Get-Content "C:\Program Files\Microsoft Configuration Manager\Logs\sitecomp.log" -Wait -Tail 30
 ```
 
-Zeilen die auf erfolgreiche Einrichtung hindeuten:
+Erwartete Zeilen nach erfolgreicher Einrichtung:
 
 ```
 Installing SMS_REST_PROVIDER ...
 SMS_REST_PROVIDER installed successfully
 ```
 
-Wenn diese Zeilen erscheinen, danach nochmals IIS Manager neu laden (F5).
+Erscheinen diese Zeilen nicht oder schlägt die Installation fehl,
+weiter mit der Diagnose unten.
 
-**b) IIS-Rolle fehlt auf dem Server**
-
-Der AdminService setzt IIS voraus. Prüfen ob IIS installiert ist:
+**IIS-Features prüfen** — alle drei müssen `Installed` sein:
 
 ```powershell
 Get-WindowsFeature -Name Web-Server, Web-Asp-Net45, Web-Windows-Auth |
     Select-Object Name, InstallState
 ```
 
-Alle drei müssen `Installed` sein. Falls nicht:
+Falls Features fehlen:
 
 ```powershell
 Install-WindowsFeature -Name Web-Server, Web-Asp-Net45, Web-Windows-Auth -IncludeManagementTools
-```
-
-Anschließend auf dem MECM-Server den Site-Component-Manager-Dienst neu
-starten, damit MECM die IIS-Konfiguration erneut ausrollt:
-
-```powershell
 Restart-Service SMS_SITE_COMPONENT_MANAGER
 ```
 
-Danach wieder `sitecomp.log` beobachten.
+Danach `sitecomp.log` erneut beobachten. Bleibt die Anwendung dauerhaft
+aus, SMS-Provider-Rolle reparieren (siehe nächster Abschnitt).
 
-**c) SMS-Provider-Rolle defekt oder nie installiert**
+---
 
-Wenn IIS vorhanden ist, aber die Anwendung dauerhaft fehlt (auch nach
-Warten und Log-Prüfung), muss die SMS-Provider-Rolle repariert werden:
+### Dienst SMS_REST_PROVIDER fehlt vollständig
 
-1. MECM-Konsole → **Administration → Site Configuration → Servers and
-   Site System Roles**
-2. Den betroffenen Server auswählen
-3. Rechtsklick auf **SMS Provider** → **Remove Role**
-4. Kurz warten, dann erneut Rechtsklick auf den Server →
-   **Add Site System Roles** → SMS Provider hinzufügen
-5. Wizard durchlaufen, danach `sitecomp.log` beobachten
+Wenn `Get-Service SMS_REST_PROVIDER` keinen Output liefert, zunächst die
+drei folgenden Registry-Keys prüfen — sie zeigen sofort welcher Fall vorliegt.
 
-Alternativ: MECM-Setup im Repair-Modus ausführen:
+#### Registry-Diagnose
+
+**Key 1 — MECM-Version und Installationspfad**
+
+```
+HKLM:\SOFTWARE\Microsoft\SMS\Setup
+```
+
+```powershell
+Get-ItemProperty "HKLM:\SOFTWARE\Microsoft\SMS\Setup" |
+    Select-Object "Full Version", "Installation Directory", "SMS Provider Location"
+```
+
+| Wert | Was er verrät |
+|---|---|
+| `Full Version` | Versionsnummer, z. B. `5.00.9068.1000` (CB 2303). Muss ≥ `5.00.8740.1000` (CB 1810) sein. |
+| `Installation Directory` | Bestätigt dass MECM auf diesem Server installiert ist |
+| `SMS Provider Location` | FQDN des SMS-Provider-Servers — relevant wenn Provider auf separatem Server läuft |
+
+Key fehlt komplett → MECM ist auf diesem Server nicht installiert. Richtigen Server suchen.
+
+**Key 2 — SMS-Provider-Rolle registriert?**
+
+```
+HKLM:\SOFTWARE\Microsoft\SMS\Providers
+```
+
+```powershell
+Get-ItemProperty "HKLM:\SOFTWARE\Microsoft\SMS\Providers" -ErrorAction SilentlyContinue
+```
+
+Key vorhanden → SMS Provider ist auf diesem Server installiert (typische Werte: `Machine`, `Namespace`).  
+Key fehlt → Rolle nicht installiert → **Fall B** unten.
+
+**Key 3 — REST-Provider-Dienst in Windows registriert?**
+
+```
+HKLM:\SYSTEM\CurrentControlSet\Services\SMS_REST_PROVIDER
+```
+
+```powershell
+Test-Path "HKLM:\SYSTEM\CurrentControlSet\Services\SMS_REST_PROVIDER"
+# True  → Dienst registriert (auch wenn gestoppt)
+# False → Dienst nie installiert
+```
+
+**Auswertung:**
+
+| Key 2 (Providers) | Key 3 (Services) | Diagnose | Fix |
+|---|---|---|---|
+| fehlt | fehlt | SMS Provider nicht installiert | Fall B |
+| vorhanden | fehlt | Provider da, REST-Dienst nie deployt | Fall C |
+| vorhanden | vorhanden | Dienst registriert aber startet nicht | Fall C |
+| — | — | Key 1 fehlt | Falscher Server |
+
+#### Fall A — MECM-Version älter als CB 1810
+
+`Full Version` < `5.00.8740.1000` → AdminService existiert nicht in dieser
+Version. Einziger Fix: MECM aktualisieren. Bis dahin Variante 04, 05, 06
+oder 07 aus der OVERVIEW verwenden.
+
+#### Fall B — SMS-Provider-Rolle nicht installiert
+
+```
+MECM-Konsole → Administration → Site Configuration
+→ Servers and Site System Roles
+→ [Server auswählen] → Rechtsklick → Add Site System Roles
+→ SMS Provider anhaken → Wizard abschließen
+```
+
+`sitecomp.log` beobachten bis die Rolle als installiert gemeldet wird,
+danach `Get-Service SMS_REST_PROVIDER` erneut prüfen.
+
+#### Fall C — Installation inkonsistent oder defekt
+
+Option 1 — Rolle entfernen und neu hinzufügen:
+
+```
+Administration → Site Configuration → Servers and Site System Roles
+→ [Server] → Rechtsklick auf SMS Provider → Remove Role
+→ kurz warten → Add Site System Roles → SMS Provider → Wizard
+```
+
+Option 2 — MECM-Setup Repair (repariert IIS-Bindings ohne Konfigurationsverlust):
 
 ```
 C:\Program Files\Microsoft Configuration Manager\bin\X64\setup.exe
@@ -374,23 +341,11 @@ C:\Program Files\Microsoft Configuration Manager\bin\X64\setup.exe
 → "Reset site with no configuration changes"
 ```
 
-Das repariert IIS-Bindings und Anwendungen ohne Konfigurationsverlust.
+Nach dem Repair:
 
----
-
-### Zertifikat wird vom Linux-Client nicht akzeptiert
-
-Das selbstsignierte Zertifikat der internen CA muss dem System-Trust-Store
-hinzugefügt werden:
-
-```bash
-# CA-Zertifikat (als .crt) in den Trust-Store importieren
-sudo cp interne-ca.crt /usr/local/share/ca-certificates/
-sudo update-ca-certificates
+```powershell
+Get-Service SMS_REST_PROVIDER   # sollte Running sein
 ```
-
-Oder für schnelle Tests: `curl -k` / `[System.Net.ServicePointManager]::ServerCertificateValidationCallback`
-(nur Dev/Test, nie Produktion).
 
 ---
 
