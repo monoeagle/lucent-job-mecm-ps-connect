@@ -311,6 +311,7 @@ NTLM mit dem angemeldeten Windows-User automatisch.
 
 1. **Origin des Runners:** Linux oder Windows? → schränkt die Optionen sofort ein.
 2. **AdminService verfügbar?** → entscheidet 01/02/03 vs. 04/05/06/07.
+   Falls noch nicht aktiv: [Aktivierung in der MECM-Konsole](docs/adminservice.md#aktivierung-in-der-mecm-konsole).
 3. **Service-Account-Strategie:** Keytab im Runner-Image? Vault-injected?
    gMSA via Workload Identity? → entscheidet Auth-Flow auf Linux.
 4. **Definition "deployed":** nur TS-Erfolg, oder + Client-Health,

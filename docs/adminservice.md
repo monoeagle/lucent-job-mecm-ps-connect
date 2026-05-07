@@ -53,6 +53,67 @@ flowchart TB
 Bei mehreren SMS-Providern hat **jeder** seinen eigenen AdminService-Endpoint;
 Load-Balancing meist via DNS-Round-Robin oder NLB.
 
+## Aktivierung in der MECM-Konsole
+
+Der AdminService ist **nicht standardmäßig aktiv** — er wird zwar mit der
+SMS-Provider-Rolle installiert, antwortet aber erst, wenn Enhanced HTTP oder
+PKI-HTTPS konfiguriert ist.
+
+### Schritt 1 — Enhanced HTTP aktivieren
+
+**Administration → Site Configuration → Sites → [Site auswählen] →
+Properties → Communication Security**
+
+Option aktivieren: **"Use Configuration Manager-generated certificates for
+HTTP site systems"**
+
+Das lässt MECM selbst-signierte Zertifikate für Site-Systeme ausstellen.
+Der AdminService nutzt dieses Zertifikat für seinen IIS-Endpoint.
+
+> **Alternativ (seltener):** Full PKI — Site-Systeme haben bereits
+> CA-signierte IIS-Zertifikate. Dann ist eHTTP nicht nötig, aber auch
+> kein Blocker.
+
+### Schritt 2 — SMS Provider-Rolle prüfen
+
+**Administration → Site Configuration → Servers and Site System Roles**
+
+Den SMS-Provider-Server auswählen und sicherstellen, dass die Rolle
+**SMS Provider** vorhanden ist. Der AdminService läuft immer auf demselben
+Host wie die SMS-Provider-Rolle.
+
+### Aktivierung verifizieren
+
+Auf dem Site-Server (PowerShell):
+
+```powershell
+Get-Service SMS_REST_PROVIDER
+# Status muss 'Running' sein
+
+Get-WebApplication -Name AdminService
+# muss existieren; PhysicalPath zeigt auf CM AdminUI\WebSite
+```
+
+Vom Client (nach Schritt 1):
+
+```bash
+curl -k -I https://<sms-provider-fqdn>/AdminService/
+# HTTP/1.1 401  →  Endpoint aktiv, Auth fehlt noch  ✓
+# HTTP/1.1 403  →  Enhanced HTTP nicht aktiv         ✗
+# Verbindungsfehler  →  IIS läuft nicht / Firewall    ✗
+```
+
+### Häufige Stolperfallen
+
+| Symptom | Ursache | Lösung |
+|---|---|---|
+| HTTP 403 | Enhanced HTTP nicht aktiviert | Schritt 1 durchführen |
+| HTTP 401 (dauerhaft) | RBAC-Recht fehlt | ConfigMgr-Rolle "Read-only Analyst" zuweisen |
+| Zertifikat-Fehler (Linux) | Selbst-signiertes Cert nicht vertraut | Interne CA in System-Trust-Store importieren |
+| `SMS_REST_PROVIDER` stopped | Dienst nach CM-Update neu starten | `Start-Service SMS_REST_PROVIDER` |
+
+---
+
 ## URL-Struktur
 
 ```
